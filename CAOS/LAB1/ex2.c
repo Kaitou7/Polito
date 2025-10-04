@@ -35,29 +35,28 @@ void vcopy_n(void* dst, const void* src, size_t count, size_t elem_size){
 bool vminmax(const void* base, size_t count, size_t elem_size,
              int (*comparator)(const void*, const void*),
              const void** out_min, const void** out_max){
-    *out_min = base;
-    *out_max = base;
+    void *min = base;
+    void *max = base;
     base +=elem_size;
     for(size_t i = 1; i<count;i++){    
         int done_min=0,done_max=0;
-        for(size_t j = 0; j<elem_size; j++){
-            if(comparator((base+j),(out_max+j))>0 && !done_max){
-                *out_max=base;
-                done_max = 1;
-            }
-            if(comparator((base+j),(out_min+j))<0 && !done_min){
-                *out_min=base;
-                done_min = 1;
-            }
-        }
+        printf("\nbase: %f, min:%f, max:%f ",*(double*)(min),*(double*)(max),*(double*)(base));
+            if(comparator((base),(max))>0)
+                max=base;
+
+            if(comparator((base),(min))<0)
+                min=base;
+            
         base +=elem_size;
     }
+    printf("\nbase: %f, min:%f, max:%f ",*(double*)(min),*(double*)(max),*(double*)(base));
+    *out_max=max;
+    *out_min=min;
 }
 
 int cmp_int32(const void* a, const void* b){
     int n = sizeof(int32_t);
-    printf("start: %"PRId32", %"PRId32"\n",*(int32_t*)a,(int32_t*)b);
-    for(size_t i = 0; i<n; i++){
+    for(size_t i = n-1; i>=0; i--){
         if(*(uint8_t*) (a+i) == *(uint8_t*) (b+i))
             continue;
         else
@@ -68,7 +67,7 @@ int cmp_int32(const void* a, const void* b){
 
 int cmp_double(const void* a, const void* b){
     int n = sizeof(double);
-    for(size_t i = 0; i<n; i++){
+    for(size_t i = n-1; i>=0; i--){
         if(*(uint8_t*) (a+i) == *(uint8_t*) (b+i))
             continue;
         else
@@ -87,9 +86,16 @@ int main(){
     vcopy_n(vet_int,&t,3,sizeof(t));
     for(int i=0;i<4;i++)
         printf("%"PRId32",",vet_int[i]);
+    /*
     int32_t *min,*max;
-    int32_t vet2[4] = {12,5,1,14};
+    int32_t vet2[4] = {45,5,50,1};
     vminmax(vet2,4,sizeof(int32_t),cmp_int32,&min,&max);
-    printf("\n prova: min:%d max:%d",*min,*max);
+    printf("\nmin:%d max:%d",*min,*max);
+    */
+    double *min,*max;
+    double vet2[4] = {452,5,50,11};
+    printf("\nSize: %d\n",sizeof(double));
+    vminmax(vet2,4,sizeof(double),cmp_double,&min,&max);
+    printf("\nmin:%f max:%f",*min,*max);
     return 0;
 }
