@@ -62,6 +62,6 @@ int main(){
     if( read_u32_le_aligned(bytes_4,4,9,&out))
         printf("\ntrue, 0x%08x",out);
     else
-        printf("\falso.");
+        printf("\false.");
     return 0;
 }
