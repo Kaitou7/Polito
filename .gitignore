@@ -1,1 +1,20 @@
+# Ignora file compilati
+*.exe
+*.dll
+*.obj
+*.pdb
 
+# Ignora build temporanee
+/bin/
+/build/
+/dist/
+
+# Ignora file di log o di sistema
+*.log
+*.tmp
+*.cache
+
+# Ignora file di configurazione locali
+.vscode/
+.idea/
+*.user
