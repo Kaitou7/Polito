@@ -4,6 +4,7 @@
 #include <stdbool.h>
 #include <stdint.h>
 #include <inttypes.h>
+#include <string.h>
 
 
 void vswap(void* a, void* b, size_t size);
@@ -15,65 +16,71 @@ int cmp_int32(const void* a, const void* b);
 int cmp_double(const void* a, const void* b);
 
 void vswap(void* a, void* b, size_t size){
-    uint8_t tmp;
-    for(size_t i=0 ; i<size;i++){
-        tmp = *(uint8_t*)(a+i);
-        *(uint8_t*)(a+i) = *(uint8_t*)(b+i);
-        *(uint8_t*)(b+i) = tmp;
-    }
+    if (a == b || size == 0) return;
+    unsigned char* pa = (unsigned char*)a;
+    unsigned char* pb = (unsigned char*)b;
+    // Use malloc to avoid huge VLAs; handles overlap too.
+    unsigned char* tmp = (unsigned char*)malloc(size);
+    if (!tmp) return; // silently ignore on OOM for this utility
+    memcpy(tmp, pa, size);
+    memcpy(pa, pb, size);
+    memcpy(pb, tmp, size);
+    free(tmp);
+
 }
 
 void vcopy_n(void* dst, const void* src, size_t count, size_t elem_size){
-    uint8_t tmp;
-    for(size_t i = 0; i<count;i++){
-        for(size_t j = 0; j<elem_size; j++){
-            *(uint8_t*)dst = *(uint8_t*)(src+j);
-            dst++;
-        }
+    if (!dst || !src || elem_size == 0 || count == 0) return;
+    size_t nbytes = count * elem_size;
+    const unsigned char* s = (const unsigned char*)src;
+    unsigned char* d = (unsigned char*)dst;
+
+    if (d == s || nbytes == 0) return;
+
+    if (d < s || d >= s + nbytes) {
+        // forward copy
+        for (size_t i = 0; i < nbytes; ++i) d[i] = s[i];
+    } else {
+        // backward copy (overlap)
+        for (size_t i = nbytes; i-- > 0; ) d[i] = s[i];
     }
+
+
 }
 bool vminmax(const void* base, size_t count, size_t elem_size,
              int (*comparator)(const void*, const void*),
              const void** out_min, const void** out_max){
-    void *min = base;
-    void *max = base;
-    base +=elem_size;
-    for(size_t i = 1; i<count;i++){    
-        int done_min=0,done_max=0;
-        printf("\nbase: %f, min:%f, max:%f ",*(double*)(min),*(double*)(max),*(double*)(base));
-            if(comparator((base),(max))>0)
-                max=base;
+    if (!base || !comparator || !out_min || !out_max || elem_size == 0) return false;
+    if (count == 0) { *out_min = *out_max = NULL; return false; }
+    const unsigned char* p = (const unsigned char*)base;
+    const unsigned char* min= base;
+    const unsigned char* max = base;
+    for(size_t i = 1; i<count;i++){
+            const unsigned char* cur = p + i * elem_size;    
+            if(comparator((cur),(max))>0)
+                max=cur;
 
-            if(comparator((base),(min))<0)
-                min=base;
+            if(comparator((cur),(min))<0)
+                min=cur;
             
-        base +=elem_size;
     }
-    printf("\nbase: %f, min:%f, max:%f ",*(double*)(min),*(double*)(max),*(double*)(base));
-    *out_max=max;
-    *out_min=min;
+    *out_max=(const void*)max;
+    *out_min=(const void*)min;
+    return true;
 }
 
 int cmp_int32(const void* a, const void* b){
-    int n = sizeof(int32_t);
-    for(size_t i = n-1; i>=0; i--){
-        if(*(uint8_t*) (a+i) == *(uint8_t*) (b+i))
-            continue;
-        else
-            return *(uint8_t*) (a+i) - *(uint8_t*) (b+i);
-    }
-    return 0;
+    const int32_t aa = *(const int32_t*)a;
+    const int32_t bb = *(const int32_t*)b;
+    return (aa > bb) - (aa < bb);
+
 }
 
 int cmp_double(const void* a, const void* b){
-    int n = sizeof(double);
-    for(size_t i = n-1; i>=0; i--){
-        if(*(uint8_t*) (a+i) == *(uint8_t*) (b+i))
-            continue;
-        else
-            return *(uint8_t*) (a+i) - *(uint8_t*) (b+i);
-    }
-    return 0;
+    const double aa = *(const double*)a;
+    const double bb = *(const double*)b;
+    return (aa > bb) - (aa < bb);
+
 }
 
 int main(){
@@ -81,11 +88,11 @@ int main(){
     vswap(&a,&b,sizeof(a));
     printf("%f %f\n",a,b);
 
-    int32_t vet_int[4] = {0,0,0,0};
-    int64_t t = 16;
-    vcopy_n(vet_int,&t,3,sizeof(t));
-    for(int i=0;i<4;i++)
-        printf("%"PRId32",",vet_int[i]);
+   int32_t arr[] = {1,2,3,4,5};
+    vcopy_n(&arr[1], &arr[0], 0, sizeof arr[0]); // overlap move right by 1
+    printf("vcopy_n: ");
+    for (size_t i=0;i<5;i++) printf("%d ", arr[i]); puts("");
+
     /*
     int32_t *min,*max;
     int32_t vet2[4] = {45,5,50,1};
