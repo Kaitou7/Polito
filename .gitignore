@@ -8,7 +8,7 @@
 /bin/
 /build/
 /dist/
-/node_modules
+/node_modules/
 # Ignora file di log o di sistema
 *.log
 *.tmp
