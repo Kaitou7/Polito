@@ -6,11 +6,15 @@ SRC = main.c util.c
 OBJS = $(SRC:.c=.o)
 
 .PHONY : all
-all : myprogram
-	./$(TARGET)	
- 
-myprogram : $(OBJS)
-	$(CC) $(OBJS) -o $(TARGET)
+all : $(TARGET)
+
+$(TARGET) : $(OBJS)
+	$(CC) $(OBJS) -o $@
+
+
+.PHONY : run
+run : $(TARGET)
+	./$(TARGET)
 
 %.o:%.c
 	$(CC) $(SFLAGS) -c $^ -o $@
