@@ -16,3 +16,4 @@ const vehicles = [
   console.log( vehicles.filter((name) => name.type ==='suv')
   .map((vehicle)=>vehicle.price).reduce( (sum, price, i, array) => sum+price/array.length,0)
   );
+  console.log("ciao");

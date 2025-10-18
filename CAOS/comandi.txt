@@ -1,0 +1,17 @@
+
+arm-none-eabi-as -mcpu=cortex-m4 startup.s -o startup.o
+
+arm-none-eabi-gcc -c -mcpu=cortex-m4 -mthumb main.c -o main.o
+
+arm-none-eabi-ld -T linker.ld startup.o main.o -o main.elf
+
+qemu-system-arm -M netduino2 -nographic -kernel main.elf
+
+____________________________________
+DEBUG
+
+gdb-multiarch app
+target remote localhost:1234
+
+
+qemu-system-arm -M netduino2 -nographic -kernel sum.elf -s -S
