@@ -1,6 +1,6 @@
 CC =arm-none-eabi
 AARCH = -mcpu=cortex-m4
-CFLAGS = -c -Wall $(AARCH) -mthumb -O1
+CFLAGS = -c -Wall $(AARCH) -mthumb
 
 LINKER = linker.ld
 FLAG_LINKER = -T $(LINKER)
@@ -32,14 +32,14 @@ qemu_debug_start:
 debug : $(TARGET_DEBUG)
 	$(qemu_debug)
 
-$(TARGET_DEBUG): $(OBJS_C_DEBUG) $(OBJS_S_DEBUG) 
+$(TARGET_DEBUG): $(OBJS_S_DEBUG)  $(OBJS_C_DEBUG) 
 	$(CC)-ld $(FLAG_LINKER) $^ -o  $@
 
-$(TARGET) : $(OBJS_C) $(OBJS_S)
+$(TARGET) : $(OBJS_S) $(OBJS_C)
 	$(CC)-ld $(FLAG_LINKER) $^ -o $@
 
 %_dbg.o : %.c 
-	$(CC)-gcc -g $(CFLAGS) -MMD -MP $< -o $@
+	$(CC)-gcc -g $(CFLAGS) $< -o $@
 
 %_dbg.o : %.s
 	$(CC)-as $(AARCH) -g $< -o $@

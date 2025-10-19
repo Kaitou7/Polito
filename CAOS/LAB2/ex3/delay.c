@@ -10,10 +10,12 @@ void delay_routine_1(){
 }
 
 void delay_routine_2(unsigned int delay_counter) {
-  asm("mov r1,r0 \n"
+  asm("push {r1} \n"
+    "mov r1,r0 \n"
       "delay: \n"
           "subs r1, #1 \n"
           "bne delay \n"
-      );
+      
+      "pop {r1} \n ");
 }
 

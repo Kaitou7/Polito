@@ -20,7 +20,7 @@ uint32_t usart_tx_start(const uint8_t *data_bytes, uint32_t n_bytes){
             }
             timeout--;
         }
-        usart1_t->data_reg =(uint8_t) *data_bytes;
+        usart1_t->data_reg =(unsigned int) *data_bytes;
         data_bytes++;
 
         if (*data_bytes=='\0' && i<n_bytes-1){

@@ -3,6 +3,9 @@
 *.dll
 *.obj
 *.pdb
+*.o
+*.d
+*.elf
 
 # Ignora build temporanee
 /bin/

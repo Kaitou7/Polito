@@ -24,3 +24,4 @@ SECTIONS
     /* The stack is placed at the end of the RAM */
     stack_top = 0x2001ffff;
 }
+

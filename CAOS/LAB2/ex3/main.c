@@ -1,9 +1,10 @@
 #include "usart.h"
 #include "delay.h"
+#include <stdint.h>
 #define BUFFER_SIZE 100
 
 int main(){
-    delay_routine_2(10);
+    delay_routine_2(50000000000);
     uint8_t *msg_0 = (uint8_t *)"Hello, World\n";
     usart_tx_start(msg_0, BUFFER_SIZE);
     uint8_t *msg_1 = (uint8_t *)"Hola, Mundo\n";
