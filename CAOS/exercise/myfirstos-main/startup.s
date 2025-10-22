@@ -26,7 +26,7 @@
 ldr r0, = _sdata
 ldr r1, = _edata
 ldr r2, = _sidata
-// copying data from .section to memory
+// copying data from .section to memory, also in C i can do it
 1:	cmp r0,r1
 	ittt lt // less than, check lt flag that change based on cmp, t is the number of instruction executed
 	ldrlt r3,[r2], #4 //adding 4 to r2
