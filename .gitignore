@@ -12,6 +12,7 @@
 /build/
 /dist/
 /node_modules/
+/FreeRTOS/
 # Ignora file di log o di sistema
 *.log
 *.tmp
