@@ -15,9 +15,9 @@ uint32_t usart_tx_start(const uint8_t *data_bytes, uint32_t n_bytes){
     for (int i = 0; i<n_bytes; i++){
         int timeout = TIMEOUT;
         while(!usart_is_tx_ready()){
-            if (timeout == 0){
+            if (timeout == 0)
                 return USART_TX_BUSY;
-            }
+            
             timeout--;
         }
         usart1_t->data_reg =(unsigned int) *data_bytes;
