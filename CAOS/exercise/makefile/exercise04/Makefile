@@ -1,18 +1,18 @@
-CC = gcc
-SFLAGS= -Wall
-#indicate errors.
-TARGET = app
-SRC = main.c
-OBJS = $(SRC:.c=.o)
+CC:=gcc
+SRC:= main.c
+TARGET:=app
+OBJ:=$(SRC:.c=.o)
 
-all : $(OBJS)
-	$(CC) $(OBJS) -o $(TARGET)
+all : $(TARGET)
+
+$(TARGET):$(OBJ)
+	$(CC) -Wall $^ -o $@
+
+*.o : *.c
+	$(CC) -Wall -c $< -o $@
 
 run : $(TARGET)
 	./$(TARGET)
 
-%.o:%.c
-	$(CC) $(SFLAGS) -c $^ -o $@
-
-clean : 
-	rm -f $(TARGET) $(OBJS)
+clean: 
+	rm -f $(TARGET)

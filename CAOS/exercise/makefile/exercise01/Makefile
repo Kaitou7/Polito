@@ -1,17 +1,17 @@
 CC = gcc
-SFLAGS= -Wall
-#indicate errors.
-TARGET = program.elf
 SRC = main.c utils.c
-OBJS = $(SRC:.c=.o)
+FLAGS = -Wall
+TARGET = program.elf
+OBJ = $(SRC:.c=.o)
 
 all: $(TARGET)
 
-$(TARGET): $(OBJS)
-	$(CC) $(CFLAGS) -o $@ $(OBJS)
+$(TARGET) : $(OBJ)
+	$(CC) $(FLAGS) $^ -o $@
 
-%.o:%.c
-	$(CC) $(SFLAGS) -c $^ -o $@
 
-clean : 
-	rm -f $(TARGET) $(OBJS)
+%.o : %.c utils.h
+	$(CC) $(FLAGS) -c $< -o $@
+
+clean: 
+	rm -f $(OBJ) $(TARGET)

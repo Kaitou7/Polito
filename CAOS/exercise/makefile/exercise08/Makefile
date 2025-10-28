@@ -1,25 +1,23 @@
 CC = gcc
-FOLDER = build
-CFLAGS= -Wall -Wextra -O2 -MMD -MP
+FOLDER_DEPS = build
+FLAGS = -Wall -MMD -MP 
+SRC = main.c math.c util.c
+OBJ = $(SRC:%.c=$(FOLDER_DEPS)/%.o)
+DEPS = $(OBJ:.o=.d)
 TARGET = app
-SRC = main.c util.c math.c
-OBJS = $(SRC:%.c=$(FOLDER)/%.o)
-DEPS = $(OBJS:.o=.d)
-all: $(TARGET)
 
-$(FOLDER)/:
-	mkdir -p $(FOLDER)
+all : $(TARGET)
 
-.PHONY : dir
+$(TARGET) : $(OBJ)
+	$(CC) -Wall $^ -o $@
 
-$(TARGET) : $(OBJS)
-	$(CC) $^ -o $@
+$(FOLDER_DEPS)/%.o : %.c | $(FOLDER_DEPS)/
+	$(CC) $(FLAGS) -c $< -o $@
 
-#| dice che deve essere costruito prima dei file .o, in più le modifiche alla directory non forzano una ricompilazione.
+$(FOLDER_DEPS)/: 
+	mkdir $(FOLDER_DEPS)
 
-$(FOLDER)/%.o: %.c $(OBJS) | $(FOLDER)/
-	$(CC) $(CFLAGS) -c $< -o $@
+clean:
+	rm -r -f $(TARGET) $(FOLDER_DEPS)
 
-clean :
-	rm -r -f $(FOLDER) $(TARGET)
 -include $(DEPS)

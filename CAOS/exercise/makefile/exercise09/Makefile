@@ -1,40 +1,39 @@
-# Build a static library (libmylib.a) and link with main.c                  
-CC := gcc
-AR := ar
-ARFLAGS := rcs
-#ar: Lo strumento archiver| rcs: Flag di operazione: r:(replace/insert): Inserisce i file oggetto o li rimpiazza se esistono già.
-#c (create): Crea l'archivio se non esiste.
-#s (symbol index): Scrive un indice dei simboli all'interno della libreria, essenziale per il linker.
-SRC_DIR := src
-CFLAGS := -Wall -Wextra -O2 -MMD -MP -I$(SRC_DIR)
+CC = gcc
+FLAGS1 = -Wall
+FLAGS2 = -MMD -MP -I $(BUILD_SRC)
 
-BUILD := build
-# Directory containing library source files,Root build directory for objects and deps
-LIB := libmylib.a
-LIB_SRCS := $(SRC_DIR)/foo.c $(SRC_DIR)/bar.c
-LIB_OBJS := $(patsubst %.c,$(BUILD)/%.o,$(notdir $(LIB_SRCS)))
-APP := app
-APP_SRCS := main.c
-APP_OBJS := $(APP_SRCS:%.c=$(BUILD)/%.o)
-DEPS := $(LIB_OBJS:.o=.d) $(APP_OBJS:.o=.d)
+BUILD = build
+BUILD_SRC = src
 
-all: $(APP)
-	
-$(APP) : $(APP_OBJS) $(LIB)
-	$(CC) $(APP_OBJS) $(LIB) -o $@
-	
-$(APP_OBJS) : $(APP_SRCS) | $(BUILD)/
-	$(CC) $(CFLAGS) -c $^ -o $@
+LIBRARY = libmylib.a
+SRC_MAIN = main.c
+SRC_OTHERS = $(BUILD_SRC)/bar.c $(BUILD_SRC)/foo.c
 
-$(LIB_OBJS) : $(LIB_SRCS) | $(BUILD)/
-	$(CC) $(CFLAGS) -c $< -o $@
+OBJ_MAIN= $(SRC_MAIN:%.c=$(BUILD)/%.o)
+OBJ_OTHERS= $(patsubst %.c,$(BUILD)/%.o,$(notdir $(SRC_OTHERS)))
+DEPS_MAIN = $(OBJ_MAIN:.o=.d)
+DEPS_OTHERS = $(OBJ_OTHERS:.o=.d)
+TARGET = app
 
-$(LIB) : $(LIB_OBJS) | $(BUILD)/
-	$(AR) $(ARFLAGS) $@ $^
-$(BUILD)/:
-	mkdir -p $(BUILD)
+all: $(TARGET)
 
--include $(DEPS)
+$(TARGET) : $(OBJ_MAIN) $(LIBRARY) 
+	$(CC) $(FLAGS1) $^ -o $@
+
+$(LIBRARY) : $(OBJ_OTHERS)
+	ar rcs $@ $^
+
+$(BUILD)/%.o: $(BUILD_SRC)/%.c | $(BUILD)/
+	$(CC) $(FLAGS1) $(FLAGS2) -c $< -o $@
+
+$(OBJ_MAIN): $(SRC_MAIN) | $(BUILD)/
+	$(CC) $(FLAGS1) $(FLAGS2) -c $< -o $@
+
+$(BUILD)/ :
+	mkdir $(BUILD)
+
+
 
 clean:
-	rm -r -f $(BUILD) $(LIB) $(APP)
+	rm -r -f $(BUILD) $(TARGET) $(LIBRARY)
+	

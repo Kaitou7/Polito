@@ -1,29 +1,20 @@
 CC = gcc
-SFLAGS= -Wall
-#indicate errors.
-TARGET = math_program.elf
+FLAGS = -Wall
 SRC = main.c math_utils.c
-OBJS = $(SRC:.c=.o)
+OBJ = $(SRC:.c=.o)
+TARGET = math_program.elf
+
 
 all: $(TARGET)
 
-$(TARGET): $(OBJS)
-	$(CC) $(CFLAGS) -o $@ $(OBJS)
-
-main.o: main.c math_utils.h
-	$(CC) $(SFLAGS) -c main.c -o main.o
+$(TARGET) : $(OBJ)
+	$(CC) $(FLAGS) $^ -o $@
 
 math_utils.o : math_utils.c math_utils.h
-	$(CC) $(SFLAGS) -c math_utils.c -o $@
+	$(CC) $(FLAGS) -c math_utils.c -o math_utils.o
 
-%.o:%.c
-	$(CC) $(SFLAGS) -c $^ -o $@
+%.o : %.c math_utils.h
+	$(CC) $(FLAGS) -c $< -o $@
 
-# Dipendenza esplicita del file oggetto da .h se viene modificato
-
-
-
-.PHONY: clean
-
-clean : 
-	rm -f $(TARGET) $(OBJS)
+clean:
+	rm -f $(TARGET) $(OBJ)

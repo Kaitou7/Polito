@@ -1,30 +1,22 @@
-CC = gcc
-CFLAGS= -Wall -Wextra -O2 -MMD -MP
-#MMD crea file .d facendo un analisi delle dipendenze e li scrive in quel file; con -M includerei in <stdio.h> 
-#MP crea per tutti quindi anche main.d, dato che non ha dipendenze lo ignora e va avanti 
-#indicate errors, -Wextra aggiunge più avvisi estendendo -Wall, -O2 è per ottimizzare .
-TARGET = app
-SRC = main.c util.c
-OBJS = $(SRC:.c=.o)
-DEPS = $(OBJS:.o=.d)
+CC := gcc
+FLAGS1:= -Wall
+FLAGS2 := -MMD -MP
+SRC := main.c util.c
+OBJ := $(SRC:.c=.o)
+DEPS:=$(OBJ:.o=.d)
+TARGET:=app
 
+.PHONY : all, clean
 
 all : $(TARGET)
 
-$(TARGET) : $(OBJS)
-	$(CC) $^ -o $@
+$(TARGET) : $(OBJ)
+	$(CC) $(FLAGS) $^ -o $@
 
-run : $(TARGET)
-	./$(TARGET)
+%.o : %.c
+	$(CC) $(FLAGS1) $(FLAGS2) -c $< -o $@
 
-%.o:%.c
-	$(CC) $(CFLAGS) -c $< -o $@
+clean:
+	rm -f $(OBJ) $(DEPS) $(TARGET)
 
 -include $(DEPS)
-
-#execute everytime clean and all
-.PHONY :clean run all
-#se nella directory avessi un file chiamato clean, non lo eseguerebbe questa regola, facendo così la esegue (vede che il file esiste già e non la esegue)
-
-clean: 
-	rm -f $(TARGET) $(OBJS) $(DEPS)
