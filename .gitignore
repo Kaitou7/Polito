@@ -13,6 +13,7 @@
 /dist/
 /node_modules/
 /FreeRTOS/
+/Assesment/2024-11-08-eos-assessment/ 
 # Ignora file di log o di sistema
 *.log
 *.tmp
@@ -22,3 +23,4 @@
 .vscode/
 .idea/
 *.user
+CAOS/Assesment/2024-11-08-eos-assessment
